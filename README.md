@@ -6,8 +6,9 @@ Reads DMARC Reports in XML format and display the results in a Dashboard.
 
 - Node.js v20.12.1
 - PNPM
-- Postgres
-- Docker
+- MongoDB 8.0
+- Typescript
+- React.js
 
 ## Install develpment environment
 
@@ -18,12 +19,21 @@ Reads DMARC Reports in XML format and display the results in a Dashboard.
    ```
 3. Create a .env file to set the environment variables.
 
-| Variable | Description | Example |
-| -------- | ----------- | ------- |
+   | Variable         | Description               | Example           |
+   | ---------------- | ------------------------- | ----------------- |
+   | APP_PORT         | Server port               | 3000              |
+   | MONGODB_USER     | Database user for the app | dmarc_reports_app |
+   | MONGODB_PASSWORD | DB user password          | myPassword@       |
+   | MONGODB_DATABASE | Database name             | dmarc_reports     |
+   | MONGODB_PORT     | Database port             | 27017             |
 
-4. Deploy containers
+4. Build the app.
    ```bash
-   docker compose up
+   pnpm run build
+   ```
+5. Start the server.
+   ```bash
+   pnpm run start
    ```
 
 ## Access the Dashboard
