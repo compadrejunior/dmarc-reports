@@ -1,4 +1,4 @@
-import { getTimestamp } from './Utils';
+import { DateUtils } from './DateUtils';
 
 export class Logger {
   // Private constructor to prevent instantiation
@@ -50,7 +50,7 @@ export class Logger {
   }
 
   private static Log(type: string, msg: string) {
-    const timestamp = getTimestamp();
+    const timestamp = DateUtils.getTimestamp();
     switch (type) {
       case this.LogType.WARN:
         console.log(

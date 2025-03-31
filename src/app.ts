@@ -1,7 +1,9 @@
 import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
-import Index from './routes/Index';
+import Index from './routes/index.route';
+import UploadFileRoute from './routes/UploadRoute';
+import { multerErrorHandler } from './middlewares/MulterErrorHandler';
 
 // deepcode ignore UseCsurfForExpress: running in private network
 const app = express();
@@ -20,10 +22,12 @@ app.use(express.json());
 
 // Register routes
 app.use('/', Index);
-// app.use('/api/deck', DeckRoute);
+const uploadRoute = new UploadFileRoute();
+app.use('/api/upload', uploadRoute.getRouter());
 // app.use('/api/card', CardRoute);
 
 // Error Middleware
 // app.use(errorHandler);
+// app.use(multerErrorHandler); // Multer/TS-compatible error handler
 
 export default app;

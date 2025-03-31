@@ -1,19 +1,31 @@
 import { Schema, model } from 'mongoose';
 
 export interface ReportFileInterface {
-  name: string;
-  fullPath: string;
+  fieldname: string;
+  originalname: string;
+  encoding: string;
+  mimetype: string;
+  destination: string;
+  filename: string;
+  path: string;
+  size: number;
   dateUploaded?: Date;
   dateImported?: Date;
-  imported: boolean;
+  status?: string;
 }
 
 const ReportFileSchema = new Schema<ReportFileInterface>({
-  name: { type: String, required: true },
-  fullPath: { type: String, required: true },
-  dateUploaded: { type: Date },
+  fieldname: { type: String },
+  originalname: { type: String },
+  encoding: { type: String },
+  mimetype: { type: String },
+  destination: { type: String },
+  filename: { type: String },
+  path: { type: String },
+  size: { type: Number },
+  dateUploaded: { type: Date, default: Date.now },
   dateImported: { type: Date },
-  imported: { type: Boolean, default: false },
+  status: { type: String, default: 'pending' },
 });
 
 export const ReportFile = model('report_files', ReportFileSchema);

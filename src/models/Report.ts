@@ -32,7 +32,7 @@ export interface ReportInterface {
 }
 
 const ReportSchema = new Schema<ReportInterface>({
-  reportID: { type: String },
+  reportID: { type: String, required: true, unique: true },
   organizationName: { type: String },
   organizationEmail: { type: String },
   begin: { type: Date },
