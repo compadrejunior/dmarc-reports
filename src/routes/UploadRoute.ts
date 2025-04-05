@@ -1,11 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import multer from 'multer';
-import UploadFileService from '../services/UploadFileService';
+import ReportFileService from '../services/ReportFileService';
 import { BaseRoute } from './BaseRoute';
+import FileUtils from '../utils/FileUtils';
 
 export default class UploadFileRoute extends BaseRoute {
   setupRoutes() {
-    this.router.post('/', this.upload, async (req, res) => {
+    this.router.post('/', this.upload, async (req, res): Promise<void> => {
       console.log('req.file=' + JSON.stringify(req.file));
       if (!req.file) {
         res.status(400).json({
@@ -14,12 +15,24 @@ export default class UploadFileRoute extends BaseRoute {
         return;
       }
       const { file } = req;
-      const result = await UploadFileService.saveFileToDatabase(file);
-      res.json(result);
-      return;
+      if (file) {
+        if (!(await ReportFileService.isValidFileType(file.path))) {
+          res.status(400).json({
+            error: {
+              status: 400,
+              message: 'Invalid file type. Required application/xml',
+            },
+          });
+          await FileUtils.deleteFile(file.path);
+          return;
+        }
+        const result = await ReportFileService.saveFileToDatabase(file);
+        res.json(result);
+      }
     });
   }
 
+  // private middleware
   private upload(req: Request, res: Response, next: NextFunction): void {
     const upload = multer({ dest: './data/upload' }).single('report-file');
     upload(req, res, async (error) => {

@@ -4,6 +4,7 @@ import cors from 'cors';
 import Index from './routes/index.route';
 import UploadFileRoute from './routes/UploadRoute';
 import { multerErrorHandler } from './middlewares/MulterErrorHandler';
+import ReportFileRoute from './routes/ReportFileRoute';
 
 // deepcode ignore UseCsurfForExpress: running in private network
 const app = express();
@@ -24,10 +25,7 @@ app.use(express.json());
 app.use('/', Index);
 const uploadRoute = new UploadFileRoute();
 app.use('/api/upload', uploadRoute.getRouter());
-// app.use('/api/card', CardRoute);
-
-// Error Middleware
-// app.use(errorHandler);
-// app.use(multerErrorHandler); // Multer/TS-compatible error handler
+const reportFileRoute = new ReportFileRoute();
+app.use('/api/report-file', reportFileRoute.getRouter());
 
 export default app;
