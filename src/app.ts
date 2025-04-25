@@ -2,9 +2,9 @@ import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import Index from './routes/index.route';
-import UploadFileRoute from './routes/UploadRoute';
-import { multerErrorHandler } from './middlewares/MulterErrorHandler';
+import UploadRoute from './routes/UploadRoute';
 import ReportFileRoute from './routes/ReportFileRoute';
+import { multerErrorHandler } from './middlewares/MulterErrorHandler';
 
 // deepcode ignore UseCsurfForExpress: running in private network
 const app = express();
@@ -23,9 +23,8 @@ app.use(express.json());
 
 // Register routes
 app.use('/', Index);
-const uploadRoute = new UploadFileRoute();
-app.use('/api/upload', uploadRoute.getRouter());
-const reportFileRoute = new ReportFileRoute();
-app.use('/api/report-file', reportFileRoute.getRouter());
+app.use('/api/upload', UploadRoute);
+app.use('/api/report-file', ReportFileRoute);
+app.use(multerErrorHandler);
 
 export default app;

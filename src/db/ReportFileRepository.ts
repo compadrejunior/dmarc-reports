@@ -19,12 +19,12 @@ export class ReportFileRepository {
 
   /**
    * Delete a report file from the databae
-   * @param filename the name of the file to be deleted
+   * @param id the report file id to be deleted
    * @returns the delete operation result
    */
-  public static async delete(filename: string) {
+  public static async delete(id: string) {
     try {
-      const result = await ReportFile.deleteOne({ filename: filename });
+      const result = await ReportFile.deleteOne({ _id: id });
       return result;
     } catch (error) {
       MongoDBError.handle(error);
@@ -33,12 +33,12 @@ export class ReportFileRepository {
 
   /**
    * Get a file by its name
-   * @param filename the name of the file to get
+   * @param id the id of the file to get
    * @returns the found report file
    */
-  public static async getFile(filename: string) {
+  public static async getFile(id: string) {
     try {
-      const result = await ReportFile.findOne({ filename });
+      const result = await ReportFile.findOne({ _id: id });
       return result;
     } catch (error) {
       MongoDBError.handle(error);

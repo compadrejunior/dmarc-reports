@@ -1,11 +1,15 @@
-import { loadEsm } from 'load-esm';
+import fs from 'fs';
+import { filetypeinfo } from 'magic-bytes.js';
 import { ReportFileRepository } from '../db/ReportFileRepository';
 import { ReportFileInterface } from '../models/ReportFile';
 import FileUtils from '../utils/FileUtils';
 
 export interface DeleteFileOutput {
-  deletedFromServer: string;
-  deletedFromDatabase: string;
+  deletedFromServer: boolean;
+  deletedFromDatabase: {
+    acknowledged: boolean;
+    deletedCount: number;
+  };
 }
 
 export default class ReportFileService {
@@ -17,7 +21,9 @@ export default class ReportFileService {
    * @returns the database file document as JSON object.
    * @throws MongoError
    */
-  public static async saveFileToDatabase(file: ReportFileInterface) {
+  public static async saveFileToDatabase(
+    file: ReportFileInterface
+  ): Promise<ReportFileInterface> {
     const result = await ReportFileRepository.save(file);
     return result;
   }
@@ -28,15 +34,13 @@ export default class ReportFileService {
    * @returns boolean
    */
   public static async isValidFileType(filePath: string): Promise<boolean> {
-    const { fileTypeFromFile } = await loadEsm<typeof import('file-type')>(
-      'file-type'
-    );
-    const type = await fileTypeFromFile(filePath);
+    console.log('[ReportFileService.ts] filePath=' + filePath);
+    const buffer = fs.readFileSync(filePath);
+    const [type] = filetypeinfo(buffer);
     const allowedTypes = ['application/xml'];
-    if (!type || !allowedTypes.includes(type.mime)) {
-      return false;
-    }
-    return true;
+    console.log('[ReportFileService.ts] type.mime=' + type.mime);
+    if (type && type.mime && allowedTypes.includes(type.mime)) return true;
+    return false;
   }
 
   /**
@@ -45,13 +49,11 @@ export default class ReportFileService {
    * @returns the delete operation result or
    * null.
    */
-  public static async deleteFile(fileName: string) {
-    const file = await ReportFileRepository.getFile(fileName);
+  public static async deleteFile(id: string): Promise<DeleteFileOutput | null> {
+    const file = await ReportFileRepository.getFile(id);
     if (file) {
       const deletedFromServer = await FileUtils.deleteFile(file.path);
-      const deletedFromDatabase = await ReportFileRepository.delete(
-        file.filename
-      );
+      const deletedFromDatabase = await ReportFileRepository.delete(id);
       return {
         deletedFromServer,
         deletedFromDatabase,
@@ -60,8 +62,22 @@ export default class ReportFileService {
     return null;
   }
 
-  public static async listAll() {
+  /**
+   * Retrieve all report files
+   * @returns list of report files
+   */
+  public static async listAll(): Promise<ReportFileInterface[]> {
     const result = await ReportFileRepository.getAllFiles();
+    return result;
+  }
+
+  /**
+   * Get a single report file
+   * @param id report file id
+   * @returns the report file object
+   */
+  public static async getFile(id: string): Promise<ReportFileInterface | null> {
+    const result = await ReportFileRepository.getFile(id);
     return result;
   }
 }
